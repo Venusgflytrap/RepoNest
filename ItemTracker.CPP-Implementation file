@@ -1,0 +1,240 @@
+#include "ItemTracker.h"
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <stdexcept>
+
+/**
+ * Constructor - Initializes the ItemTracker by reading from input file
+ * and creating a backup file automatically
+ */
+ItemTracker::ItemTracker() {
+    try {
+        std::cout << "Initializing Grocery Tracker..." << std::endl;
+        
+        // Read items from input file
+        if (!readItemsFromFile()) {
+            throw std::runtime_error("Failed to read from input file");
+        }
+        
+        // Create backup file automatically
+        if (!createBackupFile()) {
+            std::cerr << "Warning: Could not create backup file" << std::endl;
+        }
+        
+        std::cout << "Tracker initialized successfully!" << std::endl;
+        std::cout << "Total unique items loaded: " << getTotalUniqueItems() << std::endl << std::endl;
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Error during initialization: " << e.what() << std::endl;
+        throw; // Re-throw to let caller handle
+    }
+}
+
+/**
+ * Destructor - Ensures proper cleanup
+ */
+ItemTracker::~ItemTracker() {
+    // Cleanup code if needed
+    itemFrequencies.clear();
+}
+
+/**
+ * Converts string to lowercase for case-insensitive operations
+ * @param str The string to convert
+ * @return Lowercase version of the string
+ */
+std::string ItemTracker::toLowerCase(const std::string& str) const {
+    std::string lowerStr = str;
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+    return lowerStr;
+}
+
+/**
+ * Validates if a file exists and can be opened
+ * @param filename The name of the file to check
+ * @return true if file exists and is accessible, false otherwise
+ */
+bool ItemTracker::fileExists(const std::string& filename) const {
+    std::ifstream file(filename);
+    return file.good();
+}
+
+/**
+ * Reads items from the input file and populates the frequency map
+ * @return true if file was read successfully, false otherwise
+ */
+bool ItemTracker::readItemsFromFile() {
+    std::ifstream inputFile(INPUT_FILE);
+    
+    // Check if file opens successfully
+    if (!inputFile.is_open()) {
+        std::cerr << "Error: Cannot open input file '" << INPUT_FILE << "'" << std::endl;
+        std::cerr << "Please ensure the file exists in the current directory." << std::endl;
+        return false;
+    }
+    
+    std::string itemName;
+    int itemCount = 0;
+    
+    // Read each item from the file
+    while (std::getline(inputFile, itemName)) {
+        // Remove any trailing whitespace/carriage returns
+        itemName.erase(itemName.find_last_not_of(" \n\r\t") + 1);
+        
+        // Skip empty lines
+        if (itemName.empty()) {
+            continue;
+        }
+        
+        // Convert to proper case (first letter uppercase, rest lowercase)
+        if (!itemName.empty()) {
+            std::string processedName = toLowerCase(itemName);
+            processedName[0] = std::toupper(processedName[0]);
+            
+            // Increment frequency for this item
+            itemFrequencies[processedName]++;
+            itemCount++;
+        }
+    }
+    
+    inputFile.close();
+    
+    // Verify we read some data
+    if (itemFrequencies.empty()) {
+        std::cerr << "Warning: No valid items found in input file" << std::endl;
+        return false;
+    }
+    
+    std::cout << "Successfully read " << itemCount << " items from input file." << std::endl;
+    return true;
+}
+
+/**
+ * Creates a backup file with item names and frequencies
+ * @return true if backup was created successfully, false otherwise
+ */
+bool ItemTracker::createBackupFile() const {
+    std::ofstream backupFile(BACKUP_FILE);
+    
+    // Check if file opens successfully for writing
+    if (!backupFile.is_open()) {
+        std::cerr << "Error: Cannot create backup file '" << BACKUP_FILE << "'" << std::endl;
+        return false;
+    }
+    
+    // Write each item and its frequency to the backup file
+    for (const auto& pair : itemFrequencies) {
+        backupFile << pair.first << " " << pair.second << std::endl;
+    }
+    
+    backupFile.close();
+    std::cout << "Backup file '" << BACKUP_FILE << "' created successfully." << std::endl;
+    return true;
+}
+
+/**
+ * Searches for a specific item and returns its frequency
+ * @param itemName The name of the item to search for (case-insensitive)
+ * @return The frequency of the item, or 0 if not found
+ */
+int ItemTracker::searchItem(const std::string& itemName) const {
+    // Convert search term to proper case for comparison
+    std::string searchTerm = toLowerCase(itemName);
+    if (!searchTerm.empty()) {
+        searchTerm[0] = std::toupper(searchTerm[0]);
+    }
+    
+    // Search for the item in our map
+    auto it = itemFrequencies.find(searchTerm);
+    if (it != itemFrequencies.end()) {
+        return it->second;
+    }
+    
+    return 0; // Item not found
+}
+
+/**
+ * Displays all items and their frequencies in a formatted list
+ */
+void ItemTracker::displayAllItems() const {
+    if (itemFrequencies.empty()) {
+        std::cout << "No items to display." << std::endl;
+        return;
+    }
+    
+    std::cout << "\n" << std::string(50, '=') << std::endl;
+    std::cout << "           GROCERY ITEM FREQUENCIES" << std::endl;
+    std::cout << std::string(50, '=') << std::endl;
+    
+    // Find the longest item name for formatting
+    size_t maxLength = 0;
+    for (const auto& pair : itemFrequencies) {
+        maxLength = std::max(maxLength, pair.first.length());
+    }
+    
+    // Display header
+    std::cout << std::left << std::setw(maxLength + 2) << "Item Name" 
+              << "Frequency" << std::endl;
+    std::cout << std::string(maxLength + 12, '-') << std::endl;
+    
+    // Display each item with proper formatting
+    for (const auto& pair : itemFrequencies) {
+        std::cout << std::left << std::setw(maxLength + 2) << pair.first
+                  << std::right << std::setw(9) << pair.second << std::endl;
+    }
+    
+    std::cout << std::string(50, '=') << std::endl;
+    std::cout << "Total unique items: " << itemFrequencies.size() << std::endl << std::endl;
+}
+
+/**
+ * Displays a histogram of all items using asterisks to represent frequency
+ */
+void ItemTracker::displayHistogram() const {
+    if (itemFrequencies.empty()) {
+        std::cout << "No items to display in histogram." << std::endl;
+        return;
+    }
+    
+    std::cout << "\n" << std::string(60, '=') << std::endl;
+    std::cout << "                 GROCERY ITEM HISTOGRAM" << std::endl;
+    std::cout << std::string(60, '=') << std::endl;
+    
+    // Find the longest item name for formatting
+    size_t maxLength = 0;
+    for (const auto& pair : itemFrequencies) {
+        maxLength = std::max(maxLength, pair.first.length());
+    }
+    
+    // Display each item with asterisk representation
+    for (const auto& pair : itemFrequencies) {
+        std::cout << std::left << std::setw(maxLength + 1) << pair.first << " ";
+        
+        // Display asterisks based on frequency
+        for (int i = 0; i < pair.second; ++i) {
+            std::cout << "*";
+        }
+        
+        // Display frequency number at the end
+        std::cout << " (" << pair.second << ")" << std::endl;
+    }
+    
+    std::cout << std::string(60, '=') << std::endl << std::endl;
+}
+
+/**
+ * Gets the total number of unique items tracked
+ * @return The number of unique items in the tracker
+ */
+size_t ItemTracker::getTotalUniqueItems() const {
+    return itemFrequencies.size();
+}
+
+/**
+ * Checks if the tracker has been successfully initialized with data
+ * @return true if data has been loaded, false otherwise
+ */
+bool ItemTracker::isInitialized() const {
+    return !itemFrequencies.empty();
+}
