@@ -1,0 +1,76 @@
+"""
+Program Name: Hello World Application
+Developer: Lavone Frazier
+Date: October 17, 2025
+Course: CS 210 - Programming Languages
+Institution: Southern New Hampshire University
+
+Purpose: This program demonstrates the fundamental structure of a Python
+         application by displaying the classic "Hello, World!" message
+         to the console. This serves as an introduction to basic Python
+         syntax including print functions, string handling, variables,
+         and Python's clean, readable code structure.
+
+Description: A simple console application that outputs a greeting message
+             and demonstrates Python's simplicity and readability compared
+             to other programming languages like C++. Shows basic Python
+             features in an educational context.
+"""
+
+# Python does not require explicit import statements for basic functionality
+# Unlike C++, Python's print function is built-in and readily available
+# This demonstrates Python's "batteries included" philosophy
+
+# Define the main function (optional in Python but good practice)
+# Unlike C++, Python doesn't require a main function, but using one
+# demonstrates good programming structure and makes code more organized
+def main():
+    """
+    Main function: Entry point of the Python program
+    Demonstrates basic Python syntax and output operations
+    """
+    
+    # Create a variable to store our greeting message
+    # Python uses dynamic typing - no need to declare variable types
+    # This is simpler than C++ where we would need: string message = "Hello, World!";
+    greeting_message = "Hello, World!"
+    
+    # Output the message to the console using Python's print function
+    # The print() function is much simpler than C++'s cout << endl approach
+    # Python automatically adds a newline character at the end
+    print(greeting_message)
+    
+    # Demonstrate Python's string formatting capabilities
+    # This shows how Python makes string manipulation easier than C++
+    program_name = "Python Hello World"
+    developer = "[Your Name]"
+    
+    # Using f-string formatting (Python 3.6+) - a clean, readable approach
+    # This is more intuitive than C++'s stream insertion operators
+    print(f"Program: {program_name}")
+    print(f"Created by: {developer}")
+    
+    # Additional demonstration of Python's simplicity
+    # Show how Python handles different data types easily
+    version_number = 1.0
+    is_complete = True
+    
+    # Python's print function can handle multiple data types seamlessly
+    # This would require more complex code in C++
+    print(f"Version: {version_number}")
+    print(f"Status: {'Complete' if is_complete else 'In Progress'}")
+    
+    # Unlike C++, Python functions don't need explicit return statements
+    # for successful completion (though you can return values if needed)
+
+# Check if this script is being run directly (not imported)
+# This is a Python best practice similar to having a main function in C++
+# The __name__ variable is set to "__main__" when the script is run directly
+if __name__ == "__main__":
+    # Call the main function to start program execution
+    # This structure makes the code more modular and reusable
+    main()
+    
+    # Additional educational output to show Python's interactive nature
+    print("\nPython program completed successfully!")
+    print("Notice how clean and readable Python syntax is compared to C++")
