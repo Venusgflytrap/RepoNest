@@ -1,0 +1,172 @@
+#include "ItemTracker.h"
+#include <iostream>
+#include <string>
+#include <limits>
+#include <stdexcept>
+
+/**
+ * Displays the main menu options to the user
+ */
+void displayMenu() {
+    std::cout << "\n" << std::string(50, '*') << std::endl;
+    std::cout << "*            GROCERY TRACKING SYSTEM           *" << std::endl;
+    std::cout << std::string(50, '*') << std::endl;
+    std::cout << "* 1. Search for specific item frequency        *" << std::endl;
+    std::cout << "* 2. Display all items with frequencies        *" << std::endl;
+    std::cout << "* 3. Display histogram of all items            *" << std::endl;
+    std::cout << "* 4. Exit program                              *" << std::endl;
+    std::cout << std::string(50, '*') << std::endl;
+    std::cout << "Please select an option (1-4): ";
+}
+
+/**
+ * Gets a valid menu choice from the user with input validation
+ * @return Valid menu choice (1-4)
+ */
+int getMenuChoice() {
+    int choice;
+    
+    while (true) {
+        std::cin >> choice;
+        
+        // Check if input is valid
+        if (std::cin.fail()) {
+            std::cin.clear(); // Clear error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore invalid input
+            std::cout << "Invalid input! Please enter a number between 1-4: ";
+            continue;
+        }
+        
+        // Clear input buffer
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        
+        // Validate range
+        if (choice >= 1 && choice <= 4) {
+            return choice;
+        } else {
+            std::cout << "Invalid choice! Please enter a number between 1-4: ";
+        }
+    }
+}
+
+/**
+ * Gets item name from user for search functionality
+ * @return The item name entered by user
+ */
+std::string getItemName() {
+    std::string itemName;
+    std::cout << "Enter the item name to search for: ";
+    std::getline(std::cin, itemName);
+    
+    // Remove leading/trailing whitespace
+    size_t start = itemName.find_first_not_of(" \t");
+    if (start == std::string::npos) {
+        return ""; // String is all whitespace
+    }
+    size_t end = itemName.find_last_not_of(" \t");
+    return itemName.substr(start, (end - start + 1));
+}
+
+/**
+ * Handles the item search functionality
+ * @param tracker Reference to the ItemTracker object
+ */
+void handleItemSearch(const ItemTracker& tracker) {
+    std::string itemName = getItemName();
+    
+    if (itemName.empty()) {
+        std::cout << "Error: Item name cannot be empty." << std::endl;
+        return;
+    }
+    
+    int frequency = tracker.searchItem(itemName);
+    
+    std::cout << "\n" << std::string(40, '-') << std::endl;
+    if (frequency > 0) {
+        std::cout << "Item: " << itemName << std::endl;
+        std::cout << "Frequency: " << frequency << std::endl;
+    } else {
+        std::cout << "Item '" << itemName << "' was not found in the records." << std::endl;
+    }
+    std::cout << std::string(40, '-') << std::endl;
+}
+
+/**
+ * Pauses execution and waits for user to press Enter
+ */
+void pauseForUser() {
+    std::cout << "\nPress Enter to continue...";
+    std::cin.get();
+}
+
+/**
+ * Main function - Entry point of the program
+ * Manages the main program loop and user interactions
+ */
+int main() {
+    try {
+        // Display welcome message
+        std::cout << std::string(60, '=') << std::endl;
+        std::cout << "        WELCOME TO GROCERY TRACKING SYSTEM" << std::endl;
+        std::cout << std::string(60, '=') << std::endl << std::endl;
+        
+        // Initialize the ItemTracker
+        ItemTracker tracker;
+        
+        // Check if initialization was successful
+        if (!tracker.isInitialized()) {
+            std::cerr << "Error: Failed to initialize grocery tracker." << std::endl;
+            std::cerr << "Please check that '" << "CS210_Project_Three_Input_File.txt" 
+                      << "' exists and contains valid data." << std::endl;
+            return 1;
+        }
+        
+        // Main program loop
+        int choice;
+        bool continueProgram = true;
+        
+        while (continueProgram) {
+            displayMenu();
+            choice = getMenuChoice();
+            
+            switch (choice) {
+                case 1:
+                    handleItemSearch(tracker);
+                    pauseForUser();
+                    break;
+                    
+                case 2:
+                    tracker.displayAllItems();
+                    pauseForUser();
+                    break;
+                    
+                case 3:
+                    tracker.displayHistogram();
+                    pauseForUser();
+                    break;
+                    
+                case 4:
+                    continueProgram = false;
+                    std::cout << "\nThank you for using the Grocery Tracking System!" << std::endl;
+                    std::cout << "Goodbye!" << std::endl;
+                    break;
+                    
+                default:
+                    // This should never happen due to input validation
+                    std::cout << "Unexpected error occurred." << std::endl;
+                    break;
+            }
+        }
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Fatal error: " << e.what() << std::endl;
+        std::cerr << "Program will now exit." << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "Unknown fatal error occurred." << std::endl;
+        std::cerr << "Program will now exit." << std::endl;
+        return 1;
+    }
+    
+    return 0;
+}
