@@ -1,0 +1,45 @@
+/*
+ * Program Name: Hello World Application
+ * Developer: [Your Name Here]
+ * Date: [Current Date]
+ * Course: CS 210 - Programming Languages
+ * Institution: [Your Institution Name]
+ * 
+ * Purpose: This program demonstrates the fundamental structure of a C++ 
+ *          application by displaying the classic "Hello, World!" message
+ *          to the console. This serves as an introduction to basic C++
+ *          syntax including preprocessor directives, namespace usage,
+ *          the main function, and standard output operations.
+ * 
+ * Description: A simple console application that outputs a greeting message
+ *              and demonstrates proper C++ program structure and formatting
+ *              for educational purposes.
+ */
+
+// Include the iostream library for input and output operations
+// This header file contains definitions for cin, cout, and other I/O functions
+#include <iostream>
+
+// Use the standard namespace to avoid having to type "std::" before
+// standard library functions like cout and endl
+// This allows us to write "cout" instead of "std::cout"
+using namespace std;
+
+/*
+ * Function: main
+ * Purpose: Entry point of the C++ program - this is where execution begins
+ * Parameters: None (could include int argc, char* argv[] for command line arguments)
+ * Returns: int - returns 0 to indicate successful program execution
+ */
+int main() {
+    // Output the "Hello, World!" message to the console
+    // cout is the standard output stream (console)
+    // << is the stream insertion operator used to send data to cout
+    // endl inserts a newline character and flushes the output buffer
+    cout << "Hello, World!" << endl;
+    
+    // Return 0 to the operating system to indicate successful program completion
+    // A return value of 0 means "no errors occurred"
+    // Any non-zero return value typically indicates an error condition
+    return 0;
+}
