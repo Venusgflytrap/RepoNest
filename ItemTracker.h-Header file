@@ -1,0 +1,88 @@
+#ifndef ITEM_TRACKER_H
+#define ITEM_TRACKER_H
+
+#include <map>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <algorithm>
+
+/**
+ * ItemTracker class for managing grocery item frequencies
+ * Reads from input file, tracks item occurrences, and provides various display options
+ */
+class ItemTracker {
+private:
+    std::map<std::string, int> itemFrequencies;  // Map to store item names and their frequencies
+    const std::string INPUT_FILE = "CS210_Project_Three_Input_File.txt";  // Input file name
+    const std::string BACKUP_FILE = "frequency.dat";  // Backup file name
+    
+    /**
+     * Converts string to lowercase for case-insensitive operations
+     * @param str The string to convert
+     * @return Lowercase version of the string
+     */
+    std::string toLowerCase(const std::string& str) const;
+    
+    /**
+     * Validates if a file exists and can be opened
+     * @param filename The name of the file to check
+     * @return true if file exists and is accessible, false otherwise
+     */
+    bool fileExists(const std::string& filename) const;
+
+public:
+    /**
+     * Constructor - initializes ItemTracker and loads data from input file
+     * Automatically creates backup file upon successful initialization
+     */
+    ItemTracker();
+    
+    /**
+     * Destructor - ensures proper cleanup
+     */
+    ~ItemTracker();
+    
+    /**
+     * Reads items from the input file and populates the frequency map
+     * @return true if file was read successfully, false otherwise
+     */
+    bool readItemsFromFile();
+    
+    /**
+     * Creates a backup file with item names and frequencies
+     * @return true if backup was created successfully, false otherwise
+     */
+    bool createBackupFile() const;
+    
+    /**
+     * Searches for a specific item and returns its frequency
+     * @param itemName The name of the item to search for (case-insensitive)
+     * @return The frequency of the item, or 0 if not found
+     */
+    int searchItem(const std::string& itemName) const;
+    
+    /**
+     * Displays all items and their frequencies in a formatted list
+     */
+    void displayAllItems() const;
+    
+    /**
+     * Displays a histogram of all items using asterisks to represent frequency
+     */
+    void displayHistogram() const;
+    
+    /**
+     * Gets the total number of unique items tracked
+     * @return The number of unique items in the tracker
+     */
+    size_t getTotalUniqueItems() const;
+    
+    /**
+     * Checks if the tracker has been successfully initialized with data
+     * @return true if data has been loaded, false otherwise
+     */
+    bool isInitialized() const;
+};
+
+#endif // ITEM_TRACKER_H
